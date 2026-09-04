@@ -8,9 +8,9 @@ return new class extends Migration {
     {
         Schema::create('leave_types', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // ex: Congés Payés, Congés Maladie, Autorisation d'absence
-            $table->string('code')->unique(); // ex: CP, SICK, PERMIT
-            $table->string('unit')->default('days'); // 'days' or 'hours'
+            $table->string('name');
+            $table->string('code')->unique();
+            $table->string('unit')->default('days');
             $table->decimal('default_quota', 5, 2)->default(0);
             $table->timestamps();
         });
