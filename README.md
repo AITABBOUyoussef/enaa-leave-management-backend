@@ -1,66 +1,98 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏢 ENAA Leave Management System — API Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API RESTful robuste et sécurisée conçue pour la digitalisation et la gestion des demandes de congés, d'autorisations d'absence et de la continuité pédagogique au sein de l'École Numérique Ahmed El Hansali (ENAA).
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Stack Technique
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+* **Framework:** Laravel 11 / PHP 8.3
+* **Base de données:** MySQL 8.0
+* **Authentification:** Laravel Sanctum (Token-based API authentication)
+* **Autorisations & Rôles:** Spatie Laravel Permission (`employee`, `teacher`, `manager`, `hr`, `admin`)
+* **Queue / Notifications:** Laravel Database Queues
+* **Tests:** PHPUnit / Pest
+* **Conteneurisation:** Docker & Docker Compose
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 📂 Architecture Métier (Domain-Driven Services)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Conformément aux exigences architecturales du brief, la logique métier est découplée des contrôleurs dans une couche dédiée de services :
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```text
+app/
+├── Http/Controllers/Api/       # Gestion des requêtes/réponses HTTP
+├── Models/                     # Modèles Eloquent & relations
+├── Services/                   # Logique métier pure
+│   ├── LeaveCalculatorService.php  # Calcul des jours ouvrés (exclusion WE et jours fériés)
+│   └── WorkflowEngineService.php   # Gestion de la machine à états (pending_manager -> pending_hr -> approved)
+└── Notifications/              # Alertes mail et in-app via Queues
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🛠️ Installation Locale
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Prérequis
 
-### Premium Partners
+* PHP >= 8.2 & Composer
+* MySQL / MariaDB
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### Étapes d'installation
 
-## Contributing
+1. **Cloner le projet et naviguer dans le dossier backend :**
+   ```bash
+   cd enaa-leave-management-backend
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2. **Installer les dépendances Composer :**
+   ```bash
+   composer install
+   ```
 
-## Code of Conduct
+3. **Configuration de l'environnement :**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4. **Configurer la base de données dans `.env` :**
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=enaa_leave_db
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-## Security Vulnerabilities
+5. **Exécuter les migrations et seeders :**
+   ```bash
+   php artisan migrate --seed
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+6. **Lancer le serveur de développement et les workers :**
+   ```bash
+   php artisan serve
+   # Dans un autre terminal pour les notifications :
+   php artisan queue:work
+   ```
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🔑 Comptes de Test (Seeders)
+
+| Rôle | Email | Mot de passe | Description |
+| --- | --- | --- | --- |
+| **Teacher (Formateur)** | `teacher@enaa.ma` | `password123` | Accès formulaire avec continuité pédagogique |
+| **Manager (N+1)** | `manager@enaa.ma` | `password123` | Validation niveau 1 (`pending_manager`) |
+| **RH / Direction** | `hr@enaa.ma` | `password123` | Validation finale N+2, solde & planning |
+
+---
+
+## 🧪 Tests Automatisés
+
+```bash
+php artisan test
+```
